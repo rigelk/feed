@@ -67,7 +67,7 @@ feed.addItem({
     }
   }],
   date: sampleDate,
-  image: 'https://example.com/hello-world.jpg'
+  torrent: 'https://example.com/hello-world.torrent'
 })
 
 feed.addExtension({
@@ -104,7 +104,7 @@ test('it should generate an RSS 2.0 feed', () => {
             <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
             <description><![CDATA[This is an article about Hello World.]]></description>
             <author>janedoe@example.com (Jane Doe)</author>
-            <enclosure url="https://example.com/hello-world.jpg">
+            <enclosure url="https://example.com/hello-world.torrent" type="application/x-bittorrent">
             </enclosure>
         </item>
     </channel>
@@ -174,7 +174,7 @@ test('it should generate an Atom 1.0 feed', () => {
   expect(actual).toBe(expected)
 });
 
-test('it should generate a JSON v1 Feed', () => {
+test('it should generate a JSON v1 feed', () => {
     let expected = {
         "author": {
             "name": "John Doe",
@@ -190,7 +190,6 @@ test('it should generate a JSON v1 Feed', () => {
             },
             "date_modified": "2013-07-13T23:00:00Z",
             "id": "https://example.com/hello-world",
-            "image": "https://example.com/hello-world.jpg",
             "summary": "This is an article about Hello World.",
             "title": "Hello World",
             "url": "https://example.com/hello-world",

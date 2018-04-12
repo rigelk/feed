@@ -1,9 +1,8 @@
 # Feed for Node.js
 
-> [Feed](http://projets.jpmonette.net/en/feed) is a *RSS 2.0*, *JSON Feed 1.0*, and *Atom 1.0* generator for **Node.js**, making content syndication simple and intuitive!
+> Feed is a *RSS 2.0*, *JSON Feed 1.0*, *Atom 1.0* and *JSON Feed 1.0* generator for **Node.js**
 
-[![Build Status](https://travis-ci.org/jpmonette/feed.svg?branch=master)](https://travis-ci.org/jpmonette/feed)
-[![Coverage Status](https://coveralls.io/repos/github/jpmonette/feed/badge.svg?branch=master)](https://coveralls.io/github/jpmonette/feed?branch=master)
+[![Build Status](https://travis-ci.org/rigelk/feed.svg?branch=master)](https://travis-ci.org/rigelk/feed)
 
 ## Installation
 
@@ -14,7 +13,7 @@ $ npm install feed
 ## Features
 
 * Pure JavaScript
-* Support for Atom 1.0 and RSS 2.0
+* Support for Atom 1.0, Json 1.0 and RSS 2.0
 * Lightweight - Only 1 dependency!
 
 ## Quick Start
@@ -22,6 +21,7 @@ $ npm install feed
 First, add the module:
 
 ```js
+// @ts-ignore
 const Feed = require('feed')
 ```
 
@@ -118,14 +118,7 @@ Output a JSON Feed 1.0 feed:
 feed.json1()
 ```
 
-Yes, it's that simple :)!
-
-## More Information
-
-* [Feed for Node.js](http://projets.jpmonette.net/en/feed) (English)
-* [Feed pour Node.js](http://projets.jpmonette.net/feed) (French)
-* Follow [@jpmonette](https://twitter.com/jpmonette) on Twitter for updates
-* Read my personal blog [Blogue de Jean-Philippe Monette](http://blogue.jpmonette.net/) to learn more about what I do!
+Hopefully simple enough, and soon-to-be more featureful :)
 
 ## License
 

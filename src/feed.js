@@ -376,7 +376,9 @@ class Feed {
         })
       }
 
-      if(entry.image) {
+      if (entry.torrent) {
+        item.push({ enclosure: [{ _attr: { url: entry.torrent, type: 'application/x-bittorrent' } }] });
+      } else if(entry.image) {
         item.push({ enclosure: [{ _attr: { url: entry.image } }] });
       }
 
