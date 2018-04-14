@@ -67,7 +67,10 @@ feed.addItem({
     }
   }],
   date: sampleDate,
-  torrent: 'https://example.com/hello-world.torrent'
+  // torrent: 'https://example.com/hello-world.torrent'
+  torrent: {
+    url: 'https://example.com/hello-world.torrent'
+  }
 })
 
 feed.addExtension({
@@ -200,7 +203,13 @@ test('it should generate a JSON v1 feed', () => {
             "_item_extension_2": {
               "about": "just a second item extension example",
               "dummy1": "example"
-            }
+            },
+            "attachments": [
+              {
+                "mime_type": "application/x-bittorrent",
+                "url": "https://example.com/hello-world.torrent"
+              }
+            ]
         }],
         "_example_extension": {
           "about": "just an extension example",
@@ -213,4 +222,71 @@ test('it should generate a JSON v1 feed', () => {
     let actual = JSON.parse(feed.json1());
 
     expect(actual).toEqual(expected)
+});
+
+
+test('it should generate a Media RSS 1.5 feed', () => {
+  feed.addItem({
+    title: 'Hello World',
+    id: 'https://example.com/hello-world',
+    link: 'https://example.com/hello-world',
+    description: 'This is an article about Hello World.',
+    date: sampleDate,
+    torrent: [
+      {
+        url: 'https://example.com/hello-world-vp8-ogg.torrent'
+      },
+      {
+        url: 'https://example.com/hello-world-vp9-opus.torrent'
+      }
+    ]
+  });
+
+  let expected = `<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:atom=\"http://www.w3.org/2005/Atom\">
+    <channel>
+        <title>Feed Title</title>
+        <link>http://example.com/</link>
+        <description>This is my personnal feed!</description>
+        <lastBuildDate>Sat, 13 Jul 2013 23:00:00 GMT</lastBuildDate>
+        <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+        <generator>awesome</generator>
+        <image>
+            <title>Feed Title</title>
+            <url>http://example.com/image.png</url>
+            <link>http://example.com/</link>
+        </image>
+        <copyright>All rights reserved 2013, John Doe</copyright>
+        <category>Technology</category>
+        <atom:link href=\"http://example.com/feed.rss\" rel=\"self\" type=\"application/rss+xml\"/>
+        <item>
+            <geo:lat>23</geo:lat>
+            <title><![CDATA[Hello World]]></title>
+            <link>https://example.com/hello-world</link>
+            <guid>https://example.com/hello-world</guid>
+            <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
+            <description><![CDATA[This is an article about Hello World.]]></description>
+            <author>janedoe@example.com (Jane Doe)</author>
+            <enclosure url="https://example.com/hello-world.torrent" type="application/x-bittorrent">
+            </enclosure>
+        </item>
+        <item>
+            <title><![CDATA[Hello World]]></title>
+            <link>https://example.com/hello-world</link>
+            <guid>https://example.com/hello-world</guid>
+            <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
+            <description><![CDATA[This is an article about Hello World.]]></description>
+            <enclosure url="https://example.com/hello-world-vp8-ogg.torrent" type="application/x-bittorrent">
+            </enclosure>
+            <media:peerLink type="application/x-bittorrent" href="https://example.com/hello-world-vp8-ogg.torrent">
+            </media:peerLink>
+            <media:peerLink type="application/x-bittorrent" href="https://example.com/hello-world-vp9-opus.torrent">
+            </media:peerLink>
+        </item>
+    </channel>
+</rss>`;
+
+  let actual = feed.rss2()
+
+  expect(actual).toBe(expected)
 });

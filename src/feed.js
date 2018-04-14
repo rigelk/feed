@@ -344,7 +344,11 @@ class Feed {
       }
 
       if(entry.guid) {
-        item.push({ guid: entry.guid });
+        if (entry.guid.indexOf('http') === -1) {
+          item.push({ guid: { _cdata: entry.guid, _attr: {isPermaLink: 'false'} } });
+        } else {
+          item.push({ guid: entry.guid });
+        }
       } else if (entry.link) {
         item.push({ guid: entry.link });
       }
@@ -370,15 +374,44 @@ class Feed {
           if (author.email && author.name) {
             item.push({ author: author.email + ' (' + author.name + ')' })
             return true
-          } else {
-            return false
-          }
+          } else if (author.name) {
+            item.push({ 'dc:creator': author.name });
+            return true;
+          } return false
         })
       }
 
+      // rss feed only supports 1 enclosure per item
       if (entry.torrent) {
-        item.push({ enclosure: [{ _attr: { url: entry.torrent, type: 'application/x-bittorrent' } }] });
-      } else if(entry.image) {
+        let metainfo = entry.torrent;
+        if (!Array.isArray(metainfo)) metainfo = [ metainfo ];
+
+        metainfo.forEach((i, index) => {
+          let i_metainfo = i
+          if (!(i instanceof Object)) i_metainfo = { url: i };
+
+          if (index == 0)
+            item.push({ enclosure: [{ _attr: { url: i_metainfo.url, type: 'application/x-bittorrent' } }] });
+          else {
+            if (index == 1) {
+              rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+              let previous_metainfo = (!(metainfo[0] instanceof Object))? { url: metainfo[0] } : metainfo[0];
+              item.push({ 
+                'media:peerLink': [{
+                  _attr: { type: 'application/x-bittorrent', href: previous_metainfo.url }
+                }]
+              });
+            }
+            item.push({ 
+              'media:peerLink': [{
+                _attr: { type: 'application/x-bittorrent', href: i_metainfo.url }
+              }]
+            });
+          }
+        });
+
+
+       } else if(entry.image) {
         item.push({ enclosure: [{ _attr: { url: entry.image } }] });
       }
 
@@ -386,6 +419,7 @@ class Feed {
     })
 
     if(isContent) {
+      rss[0]._attr['xmlns:dc'] = 'http://purl.org/dc/elements/1.1/';
       rss[0]._attr['xmlns:content'] = 'http://purl.org/rss/1.0/modules/content/';
     }
 
@@ -414,7 +448,6 @@ class Feed {
     if (options.description) {
       feed.description = options.description;
     }
-
 
     if (options.image) {
       feed.icon = options.image;
@@ -449,6 +482,21 @@ class Feed {
       }
       if (item.description) {
         feedItem.summary = item.description;
+      }
+
+      if (item.torrent) {
+        let metainfo = item.torrent
+        if (!Array.isArray(metainfo)) metainfo = [ metainfo ]
+        if (!feedItem.attachments) feedItem.attachments = []
+
+        metainfo.forEach(i => {
+          let i_metainfo = i
+          if (!(i instanceof Object)) i_metainfo = { url: i }
+          feedItem.attachments.push({
+            ...i_metainfo,
+            mime_type: 'application/x-bittorrent'
+          })
+        });
       }
 
       if (item.image) {
