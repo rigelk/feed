@@ -68,9 +68,11 @@ feed.addItem({
   }],
   date: sampleDate,
   // torrent: 'https://example.com/hello-world.torrent'
-  torrent: {
-    url: 'https://example.com/hello-world.torrent'
-  }
+  torrent: [{
+    title: 'Hello World',
+    url: 'https://example.com/hello-world.torrent',
+    size_in_bytes: 42
+  }]
 })
 
 feed.addExtension({
@@ -107,7 +109,7 @@ test('it should generate an RSS 2.0 feed', () => {
             <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
             <description><![CDATA[This is an article about Hello World.]]></description>
             <author>janedoe@example.com (Jane Doe)</author>
-            <enclosure url="https://example.com/hello-world.torrent" type="application/x-bittorrent">
+            <enclosure type="application/x-bittorrent" url="https://example.com/hello-world.torrent" length="42">
             </enclosure>
         </item>
     </channel>
@@ -207,7 +209,9 @@ test('it should generate a JSON v1 feed', () => {
             "attachments": [
               {
                 "mime_type": "application/x-bittorrent",
-                "url": "https://example.com/hello-world.torrent"
+                "title": "Hello World",
+                "url": "https://example.com/hello-world.torrent",
+                "size_in_bytes": 42
               }
             ]
         }],
@@ -232,6 +236,10 @@ test('it should generate a Media RSS 1.5 feed', () => {
     link: 'https://example.com/hello-world',
     description: 'This is an article about Hello World.',
     date: sampleDate,
+    author: [{
+      name: 'Jane Doe',
+      link: 'jane.doe@example.com'
+    }],
     torrent: [
       {
         url: 'https://example.com/hello-world-vp8-ogg.torrent'
@@ -243,7 +251,7 @@ test('it should generate a Media RSS 1.5 feed', () => {
   });
 
   let expected = `<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:atom=\"http://www.w3.org/2005/Atom\">
+<rss version=\"2.0\" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:atom=\"http://www.w3.org/2005/Atom\">
     <channel>
         <title>Feed Title</title>
         <link>http://example.com/</link>
@@ -267,7 +275,7 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
             <description><![CDATA[This is an article about Hello World.]]></description>
             <author>janedoe@example.com (Jane Doe)</author>
-            <enclosure url="https://example.com/hello-world.torrent" type="application/x-bittorrent">
+            <enclosure type="application/x-bittorrent" url="https://example.com/hello-world.torrent" length="42">
             </enclosure>
         </item>
         <item>
@@ -276,7 +284,8 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <guid>https://example.com/hello-world</guid>
             <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
             <description><![CDATA[This is an article about Hello World.]]></description>
-            <enclosure url="https://example.com/hello-world-vp8-ogg.torrent" type="application/x-bittorrent">
+            <dc:creator>Jane Doe</dc:creator>
+            <enclosure type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent">
             </enclosure>
             <media:peerLink type="application/x-bittorrent" href="https://example.com/hello-world-vp8-ogg.torrent">
             </media:peerLink>

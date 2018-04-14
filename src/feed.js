@@ -375,6 +375,7 @@ class Feed {
             item.push({ author: author.email + ' (' + author.name + ')' })
             return true
           } else if (author.name) {
+            rss[0]._attr['xmlns:dc'] = 'http://purl.org/dc/elements/1.1/';
             item.push({ 'dc:creator': author.name });
             return true;
           } return false
@@ -390,9 +391,12 @@ class Feed {
           let i_metainfo = i
           if (!(i instanceof Object)) i_metainfo = { url: i };
 
-          if (index == 0)
-            item.push({ enclosure: [{ _attr: { url: i_metainfo.url, type: 'application/x-bittorrent' } }] });
-          else {
+          if (index == 0) {
+            item.push({ enclosure: [{ _attr: { type: 'application/x-bittorrent', url: i_metainfo.url } }] });
+            if ('size_in_bytes' in i_metainfo) {
+              item[item.length-1].enclosure[0]._attr['length'] = i_metainfo.size_in_bytes
+            }
+          } else {
             if (index == 1) {
               rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
               let previous_metainfo = (!(metainfo[0] instanceof Object))? { url: metainfo[0] } : metainfo[0];
@@ -419,7 +423,6 @@ class Feed {
     })
 
     if(isContent) {
-      rss[0]._attr['xmlns:dc'] = 'http://purl.org/dc/elements/1.1/';
       rss[0]._attr['xmlns:content'] = 'http://purl.org/rss/1.0/modules/content/';
     }
 
