@@ -387,6 +387,7 @@ class Feed {
         let metainfo = entry.torrent;
         if (!Array.isArray(metainfo)) metainfo = [ metainfo ];
 
+        let mediagroup = []
         metainfo.forEach((i, index) => {
           let i_metainfo = i
           if (!(i instanceof Object)) i_metainfo = { url: i };
@@ -400,20 +401,22 @@ class Feed {
             if (index == 1) {
               rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
               let previous_metainfo = (!(metainfo[0] instanceof Object))? { url: metainfo[0] } : metainfo[0];
-              item.push({ 
-                'media:peerLink': [{
-                  _attr: { type: 'application/x-bittorrent', href: previous_metainfo.url }
+              mediagroup.push({ 
+                'media:content': [{
+                  _attr: { type: 'application/x-bittorrent', url: previous_metainfo.url, isDefault: "true" }
                 }]
               });
             }
-            item.push({ 
-              'media:peerLink': [{
-                _attr: { type: 'application/x-bittorrent', href: i_metainfo.url }
+            mediagroup.push({ 
+              'media:content': [{
+                _attr: { type: 'application/x-bittorrent', url: i_metainfo.url }
               }]
             });
+            
           }
         });
-
+        mediagroup.push({ 'media:rating': [(entry.nsfw) ? 'adult' : 'nonadult']})
+        if (metainfo.length > 1) item.push({ 'media:group': mediagroup })
 
        } else if(entry.image) {
         item.push({ enclosure: [{ _attr: { url: entry.image } }] });
