@@ -72,6 +72,13 @@ feed.addItem({
     title: 'Hello World',
     url: 'https://example.com/hello-world.torrent',
     size_in_bytes: 42
+  }],
+  // thumbnail: 'https://example.com/hello-world.png'
+  thumbnail: [{
+    url: 'https://example.com/hello-world.png',
+    height: 320,
+    width: 560,
+    time: "12:05:01.123"
   }]
 })
 
@@ -111,6 +118,8 @@ test('it should generate an RSS 2.0 feed', () => {
             <author>janedoe@example.com (Jane Doe)</author>
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world.torrent" length="42">
             </enclosure>
+            <media:thumbnail url="https://example.com/hello-world.png" height="320" width="560" time="12:05:01.123">
+            </media:thumbnail>
         </item>
     </channel>
 </rss>`;
@@ -277,6 +286,8 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <author>janedoe@example.com (Jane Doe)</author>
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world.torrent" length="42">
             </enclosure>
+            <media:thumbnail url="https://example.com/hello-world.png" height="320" width="560" time="12:05:01.123">
+            </media:thumbnail>
         </item>
         <item>
             <title><![CDATA[Hello World]]></title>

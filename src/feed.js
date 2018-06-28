@@ -83,7 +83,7 @@ class Feed {
     // link (rel="self")
     const atomLink = options.feed || (options.feedLinks && options.feedLinks.atom);
     if(atomLink) {
-      feed.push({ "link": { _attr: { rel: 'self', href: atomLink }}});
+      feed.push({ link: { _attr: { rel: 'self', href: atomLink }}});
     }
 
     // link (rel="hub")
@@ -115,8 +115,8 @@ class Feed {
       feed.push({ category: [{ _attr: { term: category } }] });
     })
 
-    this.contributors.forEach(item => {
-      const { name, email, link } = item
+    this.contributors.forEach(_item => {
+      const { name, email, link } = _item
       let contributor = [];
 
       if(name) {
@@ -418,8 +418,26 @@ class Feed {
         mediagroup.push({ 'media:rating': [(entry.nsfw) ? 'adult' : 'nonadult']})
         if (metainfo.length > 1) item.push({ 'media:group': mediagroup })
 
-       } else if(entry.image) {
+      } else if(entry.image) {
         item.push({ enclosure: [{ _attr: { url: entry.image } }] });
+      }
+
+      if (entry.thumbnail) {
+        let thumbnail = entry.thumbnail;
+        if (!Array.isArray(thumbnail)) thumbnail = [ thumbnail ];
+
+        thumbnail.forEach((i, index) => {
+          let i_thumbnail = i
+          if (!(i instanceof Object)) i_thumbnail = { url: i };
+
+          item.push({ 
+            'media:thumbnail': [{ _attr: { url: i_thumbnail.url } }]
+          });
+          ['height', 'width', 'time'].forEach(optional_attr => {
+            if (optional_attr in i_thumbnail)
+              item[item.length-1]['media:thumbnail'][0]._attr[optional_attr] = i_thumbnail[optional_attr];
+          });
+        });
       }
 
       channel.push({ item });
