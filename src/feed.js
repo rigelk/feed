@@ -419,10 +419,15 @@ class Feed {
         if (metainfo.length > 1) item.push({ 'media:group': mediagroup })
 
       } else if(entry.image) {
-        item.push({ enclosure: [{ _attr: { url: entry.image } }] });
+        item.push({ enclosure: [{ _attr: {
+          length: entry.image.length,
+          type: entry.image.type,
+          url: entry.image.url
+        } }] });
       }
 
       if (entry.thumbnail) {
+        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
         let thumbnail = entry.thumbnail;
         if (!Array.isArray(thumbnail)) thumbnail = [ thumbnail ];
 
@@ -450,6 +455,14 @@ class Feed {
     if(isAtom) {
       rss[0]._attr['xmlns:atom'] = 'http://www.w3.org/2005/Atom';
     }
+
+    /**
+     * Sort properties to provide reproducible results for strict implementations
+     */
+    function sortObject(o) {
+      return Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
+    }
+    if (rss[0]._attr) rss[0]._attr = sortObject(rss[0]._attr)
 
     return DOCTYPE + xml(root, true);
   }
