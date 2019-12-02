@@ -1,12 +1,11 @@
-import xml from 'xml'
-import has from 'lodash/has'
-import pick from 'lodash/pick'
+import xml from "xml"
+import has from "lodash/has"
+import pick from "lodash/pick"
 
-const GENERATOR = 'Feed for Node.js'
+const GENERATOR = "Feed for Node.js"
 const DOCTYPE = '<?xml version="1.0" encoding="utf-8"?>\n'
 
 class Feed {
-
   constructor(options) {
     this.options = options
     this.items = []
@@ -37,11 +36,11 @@ class Feed {
   }
 
   render(format) {
-    console.warn('DEPRECATED: use atom1() or rss2() instead of render()');
-    if (format === 'atom-1.0') {
-      return this.atom1();
+    console.warn("DEPRECATED: use atom1() or rss2() instead of render()")
+    if (format === "atom-1.0") {
+      return this.atom1()
     } else {
-      return this.rss2();
+      return this.rss2()
     }
   }
 
@@ -49,11 +48,15 @@ class Feed {
     const { options } = this
 
     let feed = [
-      { _attr: { xmlns: 'http://www.w3.org/2005/Atom' } },
+      { _attr: { xmlns: "http://www.w3.org/2005/Atom" } },
       { id: options.id },
       { title: options.title },
-      { updated: (options.updated ? this.ISODateString(options.updated) : this.ISODateString(new Date())) },
-      { generator: options.generator || GENERATOR },
+      {
+        updated: options.updated
+          ? this.ISODateString(options.updated)
+          : this.ISODateString(new Date())
+      },
+      { generator: options.generator || GENERATOR }
     ]
 
     let root = [{ feed }]
@@ -63,77 +66,78 @@ class Feed {
       let author = []
 
       if (name) {
-        author.push({ name });
+        author.push({ name })
       }
 
       if (email) {
-        author.push({ email });
+        author.push({ email })
       }
 
       if (link) {
-        author.push({ uri: link });
+        author.push({ uri: link })
       }
 
       feed.push({ author })
     }
 
     // link (rel="alternate")
-    if(options.link) {
-      feed.push({ link: { _attr: { rel: 'alternate', href: options.link }}});
+    if (options.link) {
+      feed.push({ link: { _attr: { rel: "alternate", href: options.link } } })
     }
 
     // link (rel="self")
-    const atomLink = options.feed || (options.feedLinks && options.feedLinks.atom);
-    if(atomLink) {
-      feed.push({ link: { _attr: { rel: 'self', href: atomLink }}});
+    const atomLink =
+      options.feed || (options.feedLinks && options.feedLinks.atom)
+    if (atomLink) {
+      feed.push({ link: { _attr: { rel: "self", href: atomLink } } })
     }
 
     // link (rel="hub")
-    if(options.hub) {
-      feed.push({ link: { _attr: { rel:'hub', href: options.hub }}});
+    if (options.hub) {
+      feed.push({ link: { _attr: { rel: "hub", href: options.hub } } })
     }
 
     /**************************************************************************
      * "feed" node: optional elements
      *************************************************************************/
 
-    if(options.description) {
-      feed.push({ subtitle: options.description });
+    if (options.description) {
+      feed.push({ subtitle: options.description })
     }
 
-    if(options.image) {
-      feed.push({ logo: options.image });
+    if (options.image) {
+      feed.push({ logo: options.image })
     }
 
-    if(options.favicon) {
-      feed.push({ icon: options.favicon });
+    if (options.favicon) {
+      feed.push({ icon: options.favicon })
     }
 
-    if(options.copyright) {
-      feed.push({ rights: options.copyright });
+    if (options.copyright) {
+      feed.push({ rights: options.copyright })
     }
 
     this.categories.forEach(category => {
-      feed.push({ category: [{ _attr: { term: category } }] });
+      feed.push({ category: [{ _attr: { term: category } }] })
     })
 
     this.contributors.forEach(_item => {
       const { name, email, link } = _item
-      let contributor = [];
+      let contributor = []
 
-      if(name) {
-        contributor.push({ name });
+      if (name) {
+        contributor.push({ name })
       }
 
-      if(email) {
-        contributor.push({ email });
+      if (email) {
+        contributor.push({ email })
       }
 
-      if(link) {
-        contributor.push({ uri: link });
+      if (link) {
+        contributor.push({ uri: link })
       }
 
-      feed.push({ contributor });
+      feed.push({ contributor })
     })
 
     // icon
@@ -147,42 +151,46 @@ class Feed {
       //
 
       let entry = [
-        { title: { _attr: { type: 'html' }, _cdata: item.title }},
+        { title: { _attr: { type: "html" }, _cdata: item.title } },
         { id: item.id || item.link },
-        { link: [{ _attr: { href: item.link } }]},
+        { link: [{ _attr: { href: item.link } }] },
         { updated: this.ISODateString(item.date) }
       ]
 
       //
       // entry: recommended elements
       //
-      if(item.description) {
-        entry.push({ summary: { _attr: { type: 'html' }, _cdata: item.description }});
+      if (item.description) {
+        entry.push({
+          summary: { _attr: { type: "html" }, _cdata: item.description }
+        })
       }
 
-      if(item.content) {
-        entry.push({ content: { _attr: { type: 'html' }, _cdata: item.content }});
+      if (item.content) {
+        entry.push({
+          content: { _attr: { type: "html" }, _cdata: item.content }
+        })
       }
 
       // entry author(s)
-      if(Array.isArray(item.author)) {
+      if (Array.isArray(item.author)) {
         item.author.forEach(oneAuthor => {
           const { name, email, link } = oneAuthor
-          let author = [];
+          let author = []
 
-          if(name) {
-            author.push({ name });
+          if (name) {
+            author.push({ name })
           }
 
-          if(email) {
-            author.push({ email });
+          if (email) {
+            author.push({ email })
           }
 
-          if(link) {
-            author.push({ uri: link });
+          if (link) {
+            author.push({ uri: link })
           }
 
-          entry.push({ author });
+          entry.push({ author })
         })
       }
 
@@ -197,43 +205,43 @@ class Feed {
       // category
 
       // contributor
-      if(Array.isArray(item.contributor)) {
+      if (Array.isArray(item.contributor)) {
         item.contributor.forEach(item => {
           const { name, email, link } = item
-          let contributor = [];
+          let contributor = []
 
-          if(name) {
-            contributor.push({ name });
+          if (name) {
+            contributor.push({ name })
           }
 
-          if(email) {
-            contributor.push({ email });
+          if (email) {
+            contributor.push({ email })
           }
 
-          if(link) {
-            contributor.push({ uri: link });
+          if (link) {
+            contributor.push({ uri: link })
           }
 
-          entry.push({ contributor });
+          entry.push({ contributor })
         })
       }
 
       // published
-      if(item.published) {
-        entry.push({ published: this.ISODateString(item.published) });
+      if (item.published) {
+        entry.push({ published: this.ISODateString(item.published) })
       }
 
       // source
 
       // rights
-      if(item.copyright) {
-        entry.push({ rights: item.copyright });
+      if (item.copyright) {
+        entry.push({ rights: item.copyright })
       }
 
-      feed.push({ entry: entry });
+      feed.push({ entry: entry })
     })
 
-    return DOCTYPE + xml(root, true);
+    return DOCTYPE + xml(root, true)
   }
 
   rss2() {
@@ -245,15 +253,16 @@ class Feed {
       { title: options.title },
       { link: options.link },
       { description: options.description },
-      { lastBuildDate: (options.updated ? options.updated.toUTCString() : new Date().toUTCString()) },
-      { docs: 'http://blogs.law.harvard.edu/tech/rss'},
-      { generator: options.generator || GENERATOR },
+      {
+        lastBuildDate: options.updated
+          ? options.updated.toUTCString()
+          : new Date().toUTCString()
+      },
+      { docs: "http://blogs.law.harvard.edu/tech/rss" },
+      { generator: options.generator || GENERATOR }
     ]
 
-    let rss = [
-      { _attr: { version: '2.0' } },
-      { channel },
-    ]
+    let rss = [{ _attr: { version: "2.0" } }, { channel }]
 
     let root = [{ rss }]
 
@@ -261,22 +270,22 @@ class Feed {
      * Channel Image
      * http://cyber.law.harvard.edu/rss/rss.html#ltimagegtSubelementOfLtchannelgt
      */
-    if(options.image) {
-       channel.push({
+    if (options.image) {
+      channel.push({
         image: [
           { title: options.title },
           { url: options.image },
-          { link: options.link },
+          { link: options.link }
         ]
-      });
-     }
+      })
+    }
 
     /**
      * Channel Copyright
      * http://cyber.law.harvard.edu/rss/rss.html#optionalChannelElements
      */
-    if(options.copyright) {
-      channel.push({ copyright: options.copyright });
+    if (options.copyright) {
+      channel.push({ copyright: options.copyright })
     }
 
     /**
@@ -284,25 +293,26 @@ class Feed {
      * http://cyber.law.harvard.edu/rss/rss.html#comments
      */
     this.categories.forEach(category => {
-      channel.push({ category });
+      channel.push({ category })
     })
 
     /**
      * Feed URL
      * http://validator.w3.org/feed/docs/warning/MissingAtomSelfLink.html
      */
-    const atomLink = options.feed || (options.feedLinks && options.feedLinks.atom);
-    if(atomLink) {
+    const atomLink =
+      options.feed || (options.feedLinks && options.feedLinks.atom)
+    if (atomLink) {
       isAtom = true
 
       channel.push({
         "atom:link": {
           _attr: {
             href: atomLink,
-            rel: 'self',
-            type: 'application/rss+xml',
-          },
-        },
+            rel: "self",
+            type: "application/rss+xml"
+          }
+        }
       })
     }
 
@@ -310,15 +320,15 @@ class Feed {
      * Hub for PubSubHubbub
      * https://code.google.com/p/pubsubhubbub/
      */
-    if(options.hub) {
-      isAtom = true;
+    if (options.hub) {
+      isAtom = true
       channel.push({
         "atom:link": {
           _attr: {
             href: options.hub,
-            rel: 'hub',
-          },
-        },
+            rel: "hub"
+          }
+        }
       })
     }
 
@@ -327,283 +337,343 @@ class Feed {
      * http://cyber.law.harvard.edu/rss/rss.html#hrelementsOfLtitemgt
      */
     this.items.forEach(entry => {
-      let item = [];
+      let item = []
 
       // Handle custom fields
       this.custom_fields.forEach(field_name => {
-        if(entry[field_name]){
-          item.push({ [field_name]: entry[field_name]});
+        if (entry[field_name]) {
+          item.push({ [field_name]: entry[field_name] })
         }
+      })
 
-      });
-
-      if(entry.title) {
-        item.push({ title: { _cdata: entry.title }});
+      if (entry.title) {
+        item.push({ title: { _cdata: entry.title } })
       }
 
-      if(entry.link) {
-        item.push({ link: entry.link });
+      if (entry.link) {
+        item.push({ link: entry.link })
       }
 
-      if(entry.guid) {
-        if (entry.guid.indexOf('http') === -1) {
-          item.push({ guid: { _cdata: entry.guid, _attr: {isPermaLink: 'false'} } });
+      if (entry.guid) {
+        if (entry.guid.indexOf("http") === -1) {
+          item.push({
+            guid: { _cdata: entry.guid, _attr: { isPermaLink: "false" } }
+          })
         } else {
-          item.push({ guid: entry.guid });
+          item.push({ guid: entry.guid })
         }
       } else if (entry.link) {
-        item.push({ guid: entry.link });
+        item.push({ guid: entry.link })
       }
 
-      if(entry.date) {
-        item.push({ pubDate: entry.date.toUTCString() });
+      if (entry.date) {
+        item.push({ pubDate: entry.date.toUTCString() })
       }
 
-      if(entry.description) {
-        item.push({ description: { _cdata: entry.description }});
+      if (entry.description) {
+        item.push({ description: { _cdata: entry.description } })
       }
 
-      if(entry.content) {
-        isContent = true;
-        item.push({ 'content:encoded': { _cdata: entry.content }});
+      if (entry.content) {
+        isContent = true
+        item.push({ "content:encoded": { _cdata: entry.content } })
       }
       /**
        * Item Author
        * http://cyber.law.harvard.edu/rss/rss.html#ltauthorgtSubelementOfLtitemgt
        */
-      if(Array.isArray(entry.author)) {
+      if (Array.isArray(entry.author)) {
         entry.author.some(author => {
           if (author.email && author.name) {
-            item.push({ author: author.email + ' (' + author.name + ')' })
+            item.push({ author: author.email + " (" + author.name + ")" })
             return true
           } else if (author.name) {
-            rss[0]._attr['xmlns:dc'] = 'http://purl.org/dc/elements/1.1/';
-            item.push({ 'dc:creator': author.name });
-            return true;
-          } return false
+            rss[0]._attr["xmlns:dc"] = "http://purl.org/dc/elements/1.1/"
+            item.push({ "dc:creator": author.name })
+            return true
+          }
+          return false
         })
       }
 
       /* categories for the item */
       if (entry.categories) {
-        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
         entry.categories.forEach((i, index) => {
-          item.push({ 'media:category': [ i.value, { _attr: {
-            scheme: i.hasOwnProperty('scheme') ? i.scheme : 'http://search.yahoo.com/mrss/category_schema',
-            label: i.hasOwnProperty('label') ? i.label : null
-          } }] });
+          item.push({
+            "media:category": [
+              i.value,
+              {
+                _attr: {
+                  scheme: i.hasOwnProperty("scheme")
+                    ? i.scheme
+                    : "http://search.yahoo.com/mrss/category_schema",
+                  label: i.hasOwnProperty("label") ? i.label : null
+                }
+              }
+            ]
+          })
         })
       }
 
       /* community statistics and averaged input */
       if (entry.community) {
-        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
         let communitygroup = []
 
-        if (has(entry.community, 'statistics')) {
+        if (has(entry.community, "statistics")) {
           const i = entry.community.statistics
-          communitygroup.push({ 
-            'media:statistics': [
-              { _attr: pick(i, ['views', 'favorites']) }
-            ]
+          communitygroup.push({
+            "media:statistics": [{ _attr: pick(i, ["views", "favorites"]) }]
           })
         }
-        if (has(entry.community, 'starRating')) {
+        if (has(entry.community, "starRating")) {
           const i = entry.community.starRating
-          communitygroup.push({ 
-            'media:starRating': [
-              { _attr: pick(i, ['average', 'count', 'min', 'max']) }
+          communitygroup.push({
+            "media:starRating": [
+              { _attr: pick(i, ["average", "count", "min", "max"]) }
             ]
           })
         }
 
-        if (communitygroup.length > 0) item.push({ 'media:community': communitygroup })
+        if (communitygroup.length > 0)
+          item.push({ "media:community": communitygroup })
       }
 
       /* embed if the entry has it */
       if (entry.embed) {
-        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
-        item.push({ 'media:embed': [ { 
-          _attr: pick(entry.embed, ['url', 'width', 'height', 'type', 'allowFullScreen'])
-        } ] })
+        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+        item.push({
+          "media:embed": [
+            {
+              _attr: pick(entry.embed, [
+                "url",
+                "width",
+                "height",
+                "type",
+                "allowFullScreen"
+              ])
+            }
+          ]
+        })
       }
 
       if (entry.keywords) {
-        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
-        item.push({ 'media:keywords': [
-          entry.keywords.join(', ')
-        ] })
+        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+        item.push({ "media:keywords": [entry.keywords.join(", ")] })
       }
 
       if (entry.subTitle) {
         entry.subTitle.forEach((i, index) => {
-          if (!has(i, 'href') || !has(i, 'type' || !has(i, 'lang'))) return
+          if (!has(i, "href") || !has(i, "type" || !has(i, "lang"))) return
 
-          rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
-          item.push({ 'media:subTitle': [ { 
-            _attr: pick(i, ['href', 'type', 'lang'])
-          } ] })
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+          item.push({
+            "media:subTitle": [
+              {
+                _attr: pick(i, ["href", "type", "lang"])
+              }
+            ]
+          })
         })
       }
 
       /* player if the entry has it */
       if (entry.player) {
-        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
-        item.push({ 'media:player': [ { 
-          _attr: pick(entry.player, ['url', 'width', 'height'])
-        } ] })
+        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+        item.push({
+          "media:player": [
+            {
+              _attr: pick(entry.player, ["url", "width", "height"])
+            }
+          ]
+        })
       }
 
       // rss feed only supports 1 enclosure per item
       if (entry.torrent) {
-        let metainfo = entry.torrent;
-        if (!Array.isArray(metainfo)) metainfo = [ metainfo ];
+        let metainfo = entry.torrent
+        if (!Array.isArray(metainfo)) metainfo = [metainfo]
 
         let mediagroup = []
         metainfo.forEach((i, index) => {
           let i_metainfo = i
-          if (!(i instanceof Object)) i_metainfo = { url: i };
+          if (!(i instanceof Object)) i_metainfo = { url: i }
 
           if (index == 0) {
-            item.push({ enclosure: [{ _attr: { type: 'application/x-bittorrent', url: i_metainfo.url } }] });
-            if ('size_in_bytes' in i_metainfo) {
-              item[item.length-1].enclosure[0]._attr['length'] = i_metainfo.size_in_bytes
+            item.push({
+              enclosure: [
+                {
+                  _attr: {
+                    type: "application/x-bittorrent",
+                    url: i_metainfo.url
+                  }
+                }
+              ]
+            })
+            if ("size_in_bytes" in i_metainfo) {
+              item[item.length - 1].enclosure[0]._attr["length"] =
+                i_metainfo.size_in_bytes
             }
           } else {
             if (index == 1) {
-              rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
-              let previous_metainfo = (!(metainfo[0] instanceof Object))? { url: metainfo[0] } : metainfo[0];
-              mediagroup.push({ 
-                'media:content': [{
-                  _attr: { type: 'application/x-bittorrent', url: previous_metainfo.url, isDefault: "true" }
-                }]
-              });
+              rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+              let previous_metainfo = !(metainfo[0] instanceof Object)
+                ? { url: metainfo[0] }
+                : metainfo[0]
+              mediagroup.push({
+                "media:content": [
+                  {
+                    _attr: {
+                      type: "application/x-bittorrent",
+                      url: previous_metainfo.url,
+                      isDefault: "true"
+                    }
+                  }
+                ]
+              })
             }
-            mediagroup.push({ 
-              'media:content': [{
-                _attr: { type: 'application/x-bittorrent', url: i_metainfo.url }
-              }]
-            });
-            
+            mediagroup.push({
+              "media:content": [
+                {
+                  _attr: {
+                    type: "application/x-bittorrent",
+                    url: i_metainfo.url
+                  }
+                }
+              ]
+            })
           }
-        });
-        mediagroup.push({ 'media:rating': [(entry.nsfw) ? 'adult' : 'nonadult']})
-        if (metainfo.length > 1) item.push({ 'media:group': mediagroup })
-
-      } else if(entry.image) {
-        item.push({ enclosure: [{ _attr: {
-          length: entry.image.length,
-          type: entry.image.type,
-          url: entry.image.url
-        } }] });
+        })
+        mediagroup.push({ "media:rating": [entry.nsfw ? "adult" : "nonadult"] })
+        if (metainfo.length > 1) item.push({ "media:group": mediagroup })
+      } else if (entry.image) {
+        item.push({
+          enclosure: [
+            {
+              _attr: {
+                length: entry.image.length,
+                type: entry.image.type,
+                url: entry.image.url
+              }
+            }
+          ]
+        })
       }
 
       if (entry.thumbnail) {
-        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
-        let thumbnail = entry.thumbnail;
-        if (!Array.isArray(thumbnail)) thumbnail = [ thumbnail ];
+        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+        let thumbnail = entry.thumbnail
+        if (!Array.isArray(thumbnail)) thumbnail = [thumbnail]
 
         thumbnail.forEach((i, index) => {
           let i_thumbnail = i
-          if (!(i instanceof Object)) i_thumbnail = { url: i };
+          if (!(i instanceof Object)) i_thumbnail = { url: i }
 
-          item.push({ 
-            'media:thumbnail': [{ _attr: { url: i_thumbnail.url } }]
-          });
-          ['height', 'width', 'time'].forEach(optional_attr => {
+          item.push({
+            "media:thumbnail": [{ _attr: { url: i_thumbnail.url } }]
+          })
+          ;["height", "width", "time"].forEach(optional_attr => {
             if (optional_attr in i_thumbnail)
-              item[item.length-1]['media:thumbnail'][0]._attr[optional_attr] = i_thumbnail[optional_attr];
-          });
-        });
+              item[item.length - 1]["media:thumbnail"][0]._attr[optional_attr] =
+                i_thumbnail[optional_attr]
+          })
+        })
       }
 
       /* entry properties which make sense in a setting where MRSS attributes are already present */
-      if (entry.title && has(rss[0]._attr, 'xmlns:media')) {
-        item.push({ 'media:title': [ entry.title, { _attr: { type: 'plain' }} ]})
+      if (entry.title && has(rss[0]._attr, "xmlns:media")) {
+        item.push({
+          "media:title": [entry.title, { _attr: { type: "plain" } }]
+        })
       }
-      if (entry.description && has(rss[0]._attr, 'xmlns:media')) {
-        item.push({ 'media:description': [ entry.description, { _attr: { type: 'plain' }} ]})
+      if (entry.description && has(rss[0]._attr, "xmlns:media")) {
+        item.push({
+          "media:description": [entry.description, { _attr: { type: "plain" } }]
+        })
       }
 
-      channel.push({ item });
+      channel.push({ item })
     })
 
-    if(isContent) {
-      rss[0]._attr['xmlns:content'] = 'http://purl.org/rss/1.0/modules/content/';
+    if (isContent) {
+      rss[0]._attr["xmlns:content"] = "http://purl.org/rss/1.0/modules/content/"
     }
 
-    if(isAtom) {
-      rss[0]._attr['xmlns:atom'] = 'http://www.w3.org/2005/Atom';
+    if (isAtom) {
+      rss[0]._attr["xmlns:atom"] = "http://www.w3.org/2005/Atom"
     }
 
     /**
      * Sort properties to provide reproducible results for strict implementations
      */
     function sortObject(o) {
-      return Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
+      return Object.keys(o)
+        .sort()
+        .reduce((r, k) => ((r[k] = o[k]), r), {})
     }
     if (rss[0]._attr) rss[0]._attr = sortObject(rss[0]._attr)
 
-    return DOCTYPE + xml(root, true);
+    return DOCTYPE + xml(root, true)
   }
 
   json1() {
     const { options, items, extensions } = this
     let feed = {
-      version: 'https://jsonfeed.org/version/1',
-      title: options.title,
-    };
+      version: "https://jsonfeed.org/version/1",
+      title: options.title
+    }
 
     if (options.link) {
-      feed.home_page_url = options.link;
+      feed.home_page_url = options.link
     }
 
     if (options.feedLinks && options.feedLinks.json) {
-      feed.feed_url = options.feedLinks.json;
+      feed.feed_url = options.feedLinks.json
     }
 
     if (options.description) {
-      feed.description = options.description;
+      feed.description = options.description
     }
 
     if (options.image) {
-      feed.icon = options.image;
+      feed.icon = options.image
     }
 
     if (options.author) {
-      feed.author = {};
+      feed.author = {}
       if (options.author.name) {
-          feed.author.name = options.author.name;
+        feed.author.name = options.author.name
       }
       if (options.author.link) {
-          feed.author.url = options.author.link;
+        feed.author.url = options.author.link
       }
     }
 
     extensions.forEach(e => {
-      feed[e.name] = e.objects;
-    });
+      feed[e.name] = e.objects
+    })
 
     feed.items = items.map(item => {
       let feedItem = {
         id: item.id,
         // json_feed distinguishes between html and text content
         // but since we only take a single type, we'll assume HTML
-        html_content: item.content,
+        html_content: item.content
       }
       if (item.link) {
-        feedItem.url = item.link;
+        feedItem.url = item.link
       }
-      if(item.title) {
-        feedItem.title = item.title;
+      if (item.title) {
+        feedItem.title = item.title
       }
       if (item.description) {
-        feedItem.summary = item.description;
+        feedItem.summary = item.description
       }
 
       if (item.torrent) {
         let metainfo = item.torrent
-        if (!Array.isArray(metainfo)) metainfo = [ metainfo ]
+        if (!Array.isArray(metainfo)) metainfo = [metainfo]
         if (!feedItem.attachments) feedItem.attachments = []
 
         metainfo.forEach(i => {
@@ -611,9 +681,9 @@ class Feed {
           if (!(i instanceof Object)) i_metainfo = { url: i }
           feedItem.attachments.push({
             ...i_metainfo,
-            mime_type: 'application/x-bittorrent'
+            mime_type: "application/x-bittorrent"
           })
-        });
+        })
       }
 
       if (item.image) {
@@ -621,52 +691,59 @@ class Feed {
       }
 
       if (item.date) {
-        feedItem.date_modified = this.ISODateString(item.date);
+        feedItem.date_modified = this.ISODateString(item.date)
       }
       if (item.published) {
-        feedItem.date_published = this.ISODateString(item.published);
+        feedItem.date_published = this.ISODateString(item.published)
       }
 
       if (item.author) {
-        let author = item.author;
+        let author = item.author
         if (author instanceof Array) {
           // json feed only supports 1 author per post
-          author = author[0];
+          author = author[0]
         }
-        feedItem.author = {};
+        feedItem.author = {}
         if (author.name) {
-            feedItem.author.name = author.name;
+          feedItem.author.name = author.name
         }
         if (author.link) {
-            feedItem.author.url = author.link;
+          feedItem.author.url = author.link
         }
       }
 
-      if(item.extensions) {
+      if (item.extensions) {
         item.extensions.forEach(e => {
-          feedItem[e.name] = e.objects;
-        });
+          feedItem[e.name] = e.objects
+        })
       }
 
-      return feedItem;
-    });
+      return feedItem
+    })
 
-    return JSON.stringify(feed, null, 4);
+    return JSON.stringify(feed, null, 4)
   }
 
   ISODateString(d) {
     function pad(n) {
-      return n<10 ? '0'+n : n
+      return n < 10 ? "0" + n : n
     }
 
-    return d.getUTCFullYear() + '-'
-      + pad(d.getUTCMonth() + 1) + '-'
-      + pad(d.getUTCDate()) + 'T'
-      + pad(d.getUTCHours()) + ':'
-      + pad(d.getUTCMinutes()) + ':'
-      + pad(d.getUTCSeconds()) + 'Z'
+    return (
+      d.getUTCFullYear() +
+      "-" +
+      pad(d.getUTCMonth() + 1) +
+      "-" +
+      pad(d.getUTCDate()) +
+      "T" +
+      pad(d.getUTCHours()) +
+      ":" +
+      pad(d.getUTCMinutes()) +
+      ":" +
+      pad(d.getUTCSeconds()) +
+      "Z"
+    )
   }
-
 }
 
 module.exports = Feed
