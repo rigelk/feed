@@ -1,4 +1,6 @@
 import xml from 'xml'
+import has from 'lodash/has'
+import pick from 'lodash/pick'
 
 const GENERATOR = 'Feed for Node.js'
 const DOCTYPE = '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -382,6 +384,76 @@ class Feed {
         })
       }
 
+      /* categories for the item */
+      if (entry.categories) {
+        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        entry.categories.forEach((i, index) => {
+          item.push({ 'media:category': [ i.value, { _attr: {
+            scheme: i.hasOwnProperty('scheme') ? i.scheme : 'http://search.yahoo.com/mrss/category_schema',
+            label: i.hasOwnProperty('label') ? i.label : null
+          } }] });
+        })
+      }
+
+      /* community statistics and averaged input */
+      if (entry.community) {
+        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        let communitygroup = []
+
+        if (has(entry.community, 'statistics')) {
+          const i = entry.community.statistics
+          communitygroup.push({ 
+            'media:statistics': [
+              { _attr: pick(i, ['views', 'favorites']) }
+            ]
+          })
+        }
+        if (has(entry.community, 'starRating')) {
+          const i = entry.community.starRating
+          communitygroup.push({ 
+            'media:starRating': [
+              { _attr: pick(i, ['average', 'count', 'min', 'max']) }
+            ]
+          })
+        }
+
+        if (communitygroup.length > 0) item.push({ 'media:community': communitygroup })
+      }
+
+      /* embed if the entry has it */
+      if (entry.embed) {
+        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        item.push({ 'media:embed': [ { 
+          _attr: pick(entry.embed, ['url', 'width', 'height', 'type', 'allowFullScreen'])
+        } ] })
+      }
+
+      if (entry.keywords) {
+        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        item.push({ 'media:keywords': [
+          entry.keywords.join(', ')
+        ] })
+      }
+
+      if (entry.subTitle) {
+        entry.subTitle.forEach((i, index) => {
+          if (!has(i, 'href') || !has(i, 'type' || !has(i, 'lang'))) return
+
+          rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+          item.push({ 'media:subTitle': [ { 
+            _attr: pick(i, ['href', 'type', 'lang'])
+          } ] })
+        })
+      }
+
+      /* player if the entry has it */
+      if (entry.player) {
+        rss[0]._attr['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+        item.push({ 'media:player': [ { 
+          _attr: pick(entry.player, ['url', 'width', 'height'])
+        } ] })
+      }
+
       // rss feed only supports 1 enclosure per item
       if (entry.torrent) {
         let metainfo = entry.torrent;
@@ -443,6 +515,14 @@ class Feed {
               item[item.length-1]['media:thumbnail'][0]._attr[optional_attr] = i_thumbnail[optional_attr];
           });
         });
+      }
+
+      /* entry properties which make sense in a setting where MRSS attributes are already present */
+      if (entry.title && has(rss[0]._attr, 'xmlns:media')) {
+        item.push({ 'media:title': [ entry.title, { _attr: { type: 'plain' }} ]})
+      }
+      if (entry.description && has(rss[0]._attr, 'xmlns:media')) {
+        item.push({ 'media:description': [ entry.description, { _attr: { type: 'plain' }} ]})
       }
 
       channel.push({ item });

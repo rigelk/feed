@@ -13,8 +13,8 @@ $ npm install feed
 ## Features
 
 * Pure JavaScript
-* Support for Atom 1.0, Json 1.0 and RSS 2.0
-* Lightweight - Only 1 dependency!
+* Support for Atom 1.0, Json 1.0, RSS 2.0 (and a growing subset of MRSS)
+* Lightweight - Only 1 dependency and 2 partial dependencies!
 
 ## Quick Start
 

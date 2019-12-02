@@ -72,13 +72,6 @@ feed.addItem({
     title: 'Hello World',
     url: 'https://example.com/hello-world.torrent',
     size_in_bytes: 42
-  }],
-  // thumbnail: 'https://example.com/hello-world.png'
-  thumbnail: [{
-    url: 'https://example.com/hello-world.png',
-    height: 320,
-    width: 560,
-    time: "12:05:01.123"
   }]
 })
 
@@ -92,7 +85,7 @@ feed.addExtension({
 
 test('it should generate an RSS 2.0 feed', () => {
   let expected = `<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\">
+<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">
     <channel>
         <title>Feed Title</title>
         <link>http://example.com/</link>
@@ -118,8 +111,6 @@ test('it should generate an RSS 2.0 feed', () => {
             <author>janedoe@example.com (Jane Doe)</author>
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world.torrent" length="42">
             </enclosure>
-            <media:thumbnail url="https://example.com/hello-world.png" height="320" width="560" time="12:05:01.123">
-            </media:thumbnail>
         </item>
     </channel>
 </rss>`;
@@ -256,6 +247,47 @@ test('it should generate a Media RSS 1.5 feed', () => {
       {
         url: 'https://example.com/hello-world-vp9-opus.torrent'
       }
+    ],
+    thumbnail: [{
+      url: 'https://example.com/hello-world.png',
+      height: 320,
+      width: 560,
+      time: "12:05:01.123"
+    }],
+    categories: [
+      { value: 'Category 1' },
+      { value: 'Category 2' }
+    ],
+    community: {
+      statistics: {
+        views: "20"
+      }
+    },
+    embed: {
+      url: "https://example.com/embed/videoEmbed",
+      width: "512",
+      height: "323"
+    },
+    keywords: [
+      'Keyword 1',
+      'Keyword 2'
+    ],
+    player: {
+      url: "https://example.com/embed/videoEmbed",
+      width: "512",
+      height: "323"
+    },
+    subTitle: [
+      {
+        href: "https://example.com/subs/0001.vtt",
+        lang: "en-us"
+        // invalid because it doesn't have the type attribute
+      },
+      {
+        href: "https://example.com/subs/0001.vtt",
+        lang: "en-us",
+        type: "application/vtt"
+      }
     ]
   });
 
@@ -286,8 +318,6 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <author>janedoe@example.com (Jane Doe)</author>
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world.torrent" length="42">
             </enclosure>
-            <media:thumbnail url="https://example.com/hello-world.png" height="320" width="560" time="12:05:01.123">
-            </media:thumbnail>
         </item>
         <item>
             <title><![CDATA[Hello World]]></title>
@@ -296,6 +326,19 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <pubDate>Sat, 13 Jul 2013 23:00:00 GMT</pubDate>
             <description><![CDATA[This is an article about Hello World.]]></description>
             <dc:creator>Jane Doe</dc:creator>
+            <media:category scheme="http://search.yahoo.com/mrss/category_schema" label="null">Category 1</media:category>
+            <media:category scheme="http://search.yahoo.com/mrss/category_schema" label="null">Category 2</media:category>
+            <media:community>
+                <media:statistics views="20">
+                </media:statistics>
+            </media:community>
+            <media:embed url="https://example.com/embed/videoEmbed" width="512" height="323">
+            </media:embed>
+            <media:keywords>Keyword 1, Keyword 2</media:keywords>
+            <media:subTitle href="https://example.com/subs/0001.vtt" type="application/vtt" lang="en-us">
+            </media:subTitle>
+            <media:player url="https://example.com/embed/videoEmbed" width="512" height="323">
+            </media:player>
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent">
             </enclosure>
             <media:group>
@@ -305,6 +348,10 @@ test('it should generate a Media RSS 1.5 feed', () => {
                 </media:content>
                 <media:rating>nonadult</media:rating>
             </media:group>
+            <media:thumbnail url="https://example.com/hello-world.png" height="320" width="560" time="12:05:01.123">
+            </media:thumbnail>
+            <media:title type="plain">Hello World</media:title>
+            <media:description type="plain">This is an article about Hello World.</media:description>
         </item>
     </channel>
 </rss>`;
