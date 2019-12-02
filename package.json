@@ -27,6 +27,7 @@
     "test-travis": "export NODE_ENV=test && jest --coverage"
   },
   "jest": {
+    "testURL": "http://localhost/",
     "verbose": true,
     "collectCoverage": true,
     "collectCoverageFrom": [
