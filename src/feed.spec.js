@@ -248,6 +248,17 @@ test('it should generate a Media RSS 1.5 feed', () => {
         url: 'https://example.com/hello-world-vp9-opus.torrent'
       }
     ],
+    videos: [
+      {
+        url: 'https://example.com/hello-world.vp9',
+        md5: '0001#hash',
+        player: {
+          url: "https://example.com/embed/videoEmbed",
+          width: "512",
+          height: "323"
+        }
+      }
+    ],
     thumbnail: [{
       url: 'https://example.com/hello-world.png',
       height: 320,
@@ -342,16 +353,21 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent">
             </enclosure>
             <media:group>
-                <media:content type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent" isDefault="true">
+                <media:peerLink type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent" isDefault="true">
+                </media:peerLink>
+                <media:peerLink type="application/x-bittorrent" url="https://example.com/hello-world-vp9-opus.torrent">
+                </media:peerLink>
+                <media:content url="https://example.com/hello-world.vp9">
+                    <media:rating algo="md5">0001#hash</media:rating>
+                    <media:player url="https://example.com/embed/videoEmbed" width="512" height="323">
+                    </media:player>
                 </media:content>
-                <media:content type="application/x-bittorrent" url="https://example.com/hello-world-vp9-opus.torrent">
-                </media:content>
-                <media:rating>nonadult</media:rating>
             </media:group>
             <media:thumbnail url="https://example.com/hello-world.png" height="320" width="560" time="12:05:01.123">
             </media:thumbnail>
             <media:title type="plain">Hello World</media:title>
             <media:description type="plain">This is an article about Hello World.</media:description>
+            <media:rating>nonadult</media:rating>
         </item>
     </channel>
 </rss>`;

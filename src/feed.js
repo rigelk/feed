@@ -396,202 +396,261 @@ class Feed {
         })
       }
 
-      /* categories for the item */
-      if (entry.categories) {
-        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-        entry.categories.forEach((i, index) => {
-          item.push({
-            "media:category": [
-              i.value,
-              {
-                _attr: {
-                  scheme: i.hasOwnProperty("scheme")
-                    ? i.scheme
-                    : "http://search.yahoo.com/mrss/category_schema",
-                  label: i.hasOwnProperty("label") ? i.label : null
-                }
-              }
-            ]
-          })
-        })
-      }
-
-      /* community statistics and averaged input */
-      if (entry.community) {
-        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-        let communitygroup = []
-
-        if (has(entry.community, "statistics")) {
-          const i = entry.community.statistics
-          communitygroup.push({
-            "media:statistics": [{ _attr: pick(i, ["views", "favorites"]) }]
-          })
-        }
-        if (has(entry.community, "starRating")) {
-          const i = entry.community.starRating
-          communitygroup.push({
-            "media:starRating": [
-              { _attr: pick(i, ["average", "count", "min", "max"]) }
-            ]
-          })
-        }
-
-        if (communitygroup.length > 0)
-          item.push({ "media:community": communitygroup })
-      }
-
-      /* embed if the entry has it */
-      if (entry.embed) {
-        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-        item.push({
-          "media:embed": [
-            {
-              _attr: pick(entry.embed, [
-                "url",
-                "width",
-                "height",
-                "type",
-                "allowFullScreen"
-              ])
-            }
-          ]
-        })
-      }
-
-      if (entry.keywords) {
-        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-        item.push({ "media:keywords": [entry.keywords.join(", ")] })
-      }
-
-      if (entry.subTitle) {
-        entry.subTitle.forEach((i, index) => {
-          if (!has(i, "href") || !has(i, "type" || !has(i, "lang"))) return
-
+      const mrss = (el, target, isItem = true) => {
+        /* categories for the item */
+        if (el.categories) {
           rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-          item.push({
-            "media:subTitle": [
-              {
-                _attr: pick(i, ["href", "type", "lang"])
-              }
-            ]
-          })
-        })
-      }
-
-      /* player if the entry has it */
-      if (entry.player) {
-        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-        item.push({
-          "media:player": [
-            {
-              _attr: pick(entry.player, ["url", "width", "height"])
-            }
-          ]
-        })
-      }
-
-      // rss feed only supports 1 enclosure per item
-      if (entry.torrent) {
-        let metainfo = entry.torrent
-        if (!Array.isArray(metainfo)) metainfo = [metainfo]
-
-        let mediagroup = []
-        metainfo.forEach((i, index) => {
-          let i_metainfo = i
-          if (!(i instanceof Object)) i_metainfo = { url: i }
-
-          if (index == 0) {
-            item.push({
-              enclosure: [
+          el.categories.forEach((i, index) => {
+            target.push({
+              "media:category": [
+                i.value,
                 {
                   _attr: {
-                    type: "application/x-bittorrent",
-                    url: i_metainfo.url
+                    scheme: i.hasOwnProperty("scheme")
+                      ? i.scheme
+                      : "http://search.yahoo.com/mrss/category_schema",
+                    label: i.hasOwnProperty("label") ? i.label : null
                   }
                 }
               ]
             })
-            if ("size_in_bytes" in i_metainfo) {
-              item[item.length - 1].enclosure[0]._attr["length"] =
-                i_metainfo.size_in_bytes
-            }
-          } else {
-            if (index == 1) {
-              rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-              let previous_metainfo = !(metainfo[0] instanceof Object)
-                ? { url: metainfo[0] }
-                : metainfo[0]
-              mediagroup.push({
-                "media:content": [
+          })
+        }
+
+        /* community statistics and averaged input */
+        if (el.community) {
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+          let communitygroup = []
+
+          if (has(el.community, "statistics")) {
+            const i = el.community.statistics
+            communitygroup.push({
+              "media:statistics": [{ _attr: pick(i, ["views", "favorites"]) }]
+            })
+          }
+          if (has(el.community, "starRating")) {
+            const i = el.community.starRating
+            communitygroup.push({
+              "media:starRating": [
+                { _attr: pick(i, ["average", "count", "min", "max"]) }
+              ]
+            })
+          }
+
+          if (communitygroup.length > 0)
+            target.push({ "media:community": communitygroup })
+        }
+
+        /* embed if the el has it */
+        if (el.embed) {
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+          target.push({
+            "media:embed": [
+              {
+                _attr: pick(el.embed, [
+                  "url",
+                  "width",
+                  "height",
+                  "type",
+                  "allowFullScreen"
+                ])
+              }
+            ]
+          })
+        }
+
+        if (el.keywords) {
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+          target.push({ "media:keywords": [el.keywords.join(", ")] })
+        }
+
+        if (el.subTitle) {
+          el.subTitle.forEach((i, index) => {
+            if (!has(i, "href") || !has(i, "type" || !has(i, "lang"))) return
+
+            rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+            target.push({
+              "media:subTitle": [
+                {
+                  _attr: pick(i, ["href", "type", "lang"])
+                }
+              ]
+            })
+          })
+        }
+
+        /* player if the el has it */
+        if (el.player) {
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+          target.push({
+            "media:player": [
+              {
+                _attr: pick(el.player, ["url", "width", "height"])
+              }
+            ]
+          })
+        }
+
+        /**
+         * Feed supports *one* MRSS media:group
+         */
+        let mediagroup = []
+
+        /**
+         * rss feed only supports 1 enclosure per el, so switching to
+         * MRSS and its support for multiple enclosures is the next step.
+         */
+        if (el.torrent && isItem) {
+          let metainfo = el.torrent
+          if (!Array.isArray(metainfo)) metainfo = [metainfo]
+
+          metainfo.forEach((i, index) => {
+            let i_metainfo = i
+            if (!(i instanceof Object)) i_metainfo = { url: i }
+
+            if (index == 0) {
+              target.push({
+                enclosure: [
                   {
                     _attr: {
                       type: "application/x-bittorrent",
-                      url: previous_metainfo.url,
-                      isDefault: "true"
+                      url: i_metainfo.url
+                    }
+                  }
+                ]
+              })
+              if ("size_in_bytes" in i_metainfo) {
+                target[target.length - 1].enclosure[0]._attr["length"] =
+                  i_metainfo.size_in_bytes
+              }
+            } else {
+              if (index == 1) {
+                rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+                let previous_metainfo = !(metainfo[0] instanceof Object)
+                  ? { url: metainfo[0] }
+                  : metainfo[0]
+                mediagroup.push({
+                  "media:peerLink": [
+                    {
+                      _attr: {
+                        type: "application/x-bittorrent",
+                        href: previous_metainfo.url,
+                        isDefault: "true"
+                      }
+                    }
+                  ]
+                })
+              }
+              mediagroup.push({
+                "media:peerLink": [
+                  {
+                    _attr: {
+                      type: "application/x-bittorrent",
+                      href: i_metainfo.url
                     }
                   }
                 ]
               })
             }
-            mediagroup.push({
-              "media:content": [
+          })
+        }
+
+        if (el.videos && isItem) {
+          el.videos.forEach(v => {
+            const videoParse = () => {
+              let content = [
                 {
-                  _attr: {
-                    type: "application/x-bittorrent",
-                    url: i_metainfo.url
-                  }
+                  _attr: pick(v, [
+                    "url",
+                    "fileSize",
+                    "type",
+                    "medium",
+                    "expression",
+                    "bitrate",
+                    "framerate",
+                    "samplingrate",
+                    "channels",
+                    "duration",
+                    "height",
+                    "width",
+                    "lang"
+                  ])
                 }
               ]
-            })
-          }
-        })
-        mediagroup.push({ "media:rating": [entry.nsfw ? "adult" : "nonadult"] })
-        if (metainfo.length > 1) item.push({ "media:group": mediagroup })
-      } else if (entry.image) {
-        item.push({
-          enclosure: [
-            {
-              _attr: {
-                length: entry.image.length,
-                type: entry.image.type,
-                url: entry.image.url
-              }
+              const algo = ["md5", "sha-1"]
+              algo.map(algo =>
+                has(v, algo)
+                  ? content.push({
+                      "media:rating": [{ _attr: { algo } }, v[algo]]
+                    })
+                  : ""
+              )
+              mrss(v, content, (isItem = false))
+              return content
             }
-          ]
-        })
-      }
-
-      if (entry.thumbnail) {
-        rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
-        let thumbnail = entry.thumbnail
-        if (!Array.isArray(thumbnail)) thumbnail = [thumbnail]
-
-        thumbnail.forEach((i, index) => {
-          let i_thumbnail = i
-          if (!(i instanceof Object)) i_thumbnail = { url: i }
-
-          item.push({
-            "media:thumbnail": [{ _attr: { url: i_thumbnail.url } }]
+            mediagroup.push({
+              "media:content": videoParse()
+            })
           })
-          ;["height", "width", "time"].forEach(optional_attr => {
-            if (optional_attr in i_thumbnail)
-              item[item.length - 1]["media:thumbnail"][0]._attr[optional_attr] =
-                i_thumbnail[optional_attr]
+        }
+
+        if (mediagroup.length > 1) {
+          /* make redundant information for MRSS clients that only look for the media:group and its contents */
+          // mrss(entry, mediagroup, isItem = false) // isItem MUST be false, to prevent infinite recursion
+
+          target.push({ "media:group": mediagroup })
+        } else if (el.image) {
+          target.push({
+            enclosure: [
+              {
+                _attr: {
+                  length: el.image.length,
+                  type: el.image.type,
+                  url: el.image.url
+                }
+              }
+            ]
           })
-        })
+        }
+
+        if (el.thumbnail) {
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+          let thumbnail = el.thumbnail
+          if (!Array.isArray(thumbnail)) thumbnail = [thumbnail]
+
+          thumbnail.forEach((i, index) => {
+            let i_thumbnail = i
+            if (!(i instanceof Object)) i_thumbnail = { url: i }
+
+            target.push({
+              "media:thumbnail": [{ _attr: { url: i_thumbnail.url } }]
+            })
+            ;["height", "width", "time"].forEach(optional_attr => {
+              if (optional_attr in i_thumbnail)
+                target[target.length - 1]["media:thumbnail"][0]._attr[
+                  optional_attr
+                ] = i_thumbnail[optional_attr]
+            })
+          })
+        }
+
+        /* el properties which make sense in a setting where MRSS attributes are already present */
+        if (el.title && has(rss[0]._attr, "xmlns:media")) {
+          target.push({
+            "media:title": [el.title, { _attr: { type: "plain" } }]
+          })
+        }
+        if (el.description && has(rss[0]._attr, "xmlns:media")) {
+          target.push({
+            "media:description": [el.description, { _attr: { type: "plain" } }]
+          })
+        }
       }
 
-      /* entry properties which make sense in a setting where MRSS attributes are already present */
-      if (entry.title && has(rss[0]._attr, "xmlns:media")) {
-        item.push({
-          "media:title": [entry.title, { _attr: { type: "plain" } }]
-        })
-      }
-      if (entry.description && has(rss[0]._attr, "xmlns:media")) {
-        item.push({
-          "media:description": [entry.description, { _attr: { type: "plain" } }]
-        })
-      }
+      mrss(entry, item)
+
+      if (has(rss[0]._attr, "xmlns:media"))
+        item.push({ "media:rating": [item.nsfw ? "adult" : "nonadult"] })
 
       channel.push({ item })
     })
