@@ -353,12 +353,12 @@ test('it should generate a Media RSS 1.5 feed', () => {
             <enclosure type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent">
             </enclosure>
             <media:group>
-                <media:peerLink type="application/x-bittorrent" url="https://example.com/hello-world-vp8-ogg.torrent" isDefault="true">
+                <media:peerLink type="application/x-bittorrent" href="https://example.com/hello-world-vp8-ogg.torrent" isDefault="true">
                 </media:peerLink>
-                <media:peerLink type="application/x-bittorrent" url="https://example.com/hello-world-vp9-opus.torrent">
+                <media:peerLink type="application/x-bittorrent" href="https://example.com/hello-world-vp9-opus.torrent">
                 </media:peerLink>
                 <media:content url="https://example.com/hello-world.vp9">
-                    <media:rating algo="md5">0001#hash</media:rating>
+                    <media:hash algo="md5">0001#hash</media:hash>
                     <media:player url="https://example.com/embed/videoEmbed" width="512" height="323">
                     </media:player>
                 </media:content>

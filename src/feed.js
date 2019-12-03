@@ -581,7 +581,7 @@ class Feed {
               algo.map(algo =>
                 has(v, algo)
                   ? content.push({
-                      "media:rating": [{ _attr: { algo } }, v[algo]]
+                      "media:hash": [{ _attr: { algo } }, v[algo]]
                     })
                   : ""
               )
