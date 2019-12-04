@@ -1,6 +1,6 @@
 {
   "name": "pfeed",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Feed is a RSS 2.0, Atom 1.0 and Json Feed 1.0 generator for Node.js, based on work from Jean-Philippe Monette and initiated by a need of the PeerTube project",
   "homepage": "http://github.com/rigelk/feed",
   "author": "Rigel Kent <sendmemail@rigelk.eu>",

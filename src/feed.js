@@ -401,6 +401,7 @@ class Feed {
         if (el.categories) {
           rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
           el.categories.forEach((i, index) => {
+            if (!i.value) return
             target.push({
               "media:category": [
                 i.value,
