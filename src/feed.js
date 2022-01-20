@@ -492,10 +492,38 @@ class Feed {
           })
         }
 
+        if (isItem && el.enclosures) {
+          target.push({
+            enclosure: el.enclosures.map(({ length, type, url }) => ({
+              _attr: {
+                length,
+                type,
+                url
+              }
+            }))
+          })
+        }
+
         /**
          * Feed supports *one* MRSS media:group
          */
         let mediagroup = []
+
+        if (isItem && el.peerLinks) {
+          rss[0]._attr["xmlns:media"] = "http://search.yahoo.com/mrss/"
+
+          el.peerLinks.forEach(({ href, type }, index) =>
+            mediagroup.push({
+              "media:peerLink": [{
+                _attr: {
+                  href,
+                  isDefault: index === 0,
+                  type
+                }
+              }]
+            })
+          );
+        }
 
         /**
          * rss feed only supports 1 enclosure per el, so switching to
@@ -595,7 +623,7 @@ class Feed {
           })
         }
 
-        if (mediagroup.length > 1) {
+        if (mediagroup.length > 0) {
           /* make redundant information for MRSS clients that only look for the media:group and its contents */
           // mrss(entry, mediagroup, isItem = false) // isItem MUST be false, to prevent infinite recursion
 

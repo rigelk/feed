@@ -376,3 +376,40 @@ test('it should generate a Media RSS 1.5 feed', () => {
 
   expect(actual).toBe(expected)
 });
+
+test('it should generate a Media RSS 1.5 feed with specified enclosure tag', () => {
+  const length = 2423;
+  const type = 'video/mp4';
+  const url = 'https://enclosure.url/vid.mp4';
+
+  feed.addItem({
+    enclosures: [{
+      length,
+      type,
+      url
+    }]
+  });
+
+  expect(feed.rss2()).toContain(`<enclosure length="${length}" type="${type}" url="${url}"`);
+});
+
+test('it should generate a Media RSS 1.5 feed with specified peerLinks tag', () => {
+  const peerLinks = [
+    {
+      type: 'application/x-bittorent',
+      href: 'torrent.url'
+    },
+    {
+      type: 'application/x-bittorent2',
+      href: 'torrent.url2'
+    }
+  ];
+
+  feed.addItem({
+    peerLinks
+  });
+
+  peerLinks.forEach(({ href, type }, index) =>
+    expect(feed.rss2()).toContain(`<media:peerLink href="${href}" isDefault="${index === 0}" type="${type}"`)
+  );
+});
